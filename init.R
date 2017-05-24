@@ -2,8 +2,7 @@
 # VERIFICA SE PACOTE ESTA INSTALDO
 pkgTest <- function(pack_)
 {
-  if (!require(pack_,character.only = TRUE))
-  {
+  if (!require(pack_,character.only = TRUE)){
     install.packages(pack_,dep=TRUE)
     if(!require(pack_,character.only = TRUE)) stop("Package not found")
   }
