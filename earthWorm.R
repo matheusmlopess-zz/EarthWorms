@@ -1,5 +1,6 @@
 setwd("~/Desktop/gits/EarthWorms/")
 source("init.R")
+guiEarthWorm()
 
 #SORT TABLE BY KEY=textura
 #sort(don$textura)
