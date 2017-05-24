@@ -12,10 +12,25 @@ pkgTest <- function(pack_)
 pkgTest("FactoMineR")
 pkgTest("DiscriMiner")
 pkgTest("MASS")
+pkgTest("gWidgets")
 
 library(FactoMineR)
 library(DiscriMiner)
 library(MASS)
+library(gWidgets)
+
+
+win <- gwindow("Tab delimited file upload example")
+grp_name <- ggroup(container = win)
+
+lbl_data_frame_name <- glabel(
+  "Variable to save data to: ",
+  container = grp_name
+)
+
+txt_data_frame_name <- gedit("dfr", container = grp_name)
+grp_upload <- ggroup(container = win)
+
 
 cat("a. Select Before Working Directory:") 
 pathToFolder <- file.choose()
