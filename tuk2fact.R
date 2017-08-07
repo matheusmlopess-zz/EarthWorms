@@ -1,5 +1,3 @@
-
-
 if(!exists("foo", mode="function")) source("init2.R")
 
 cat("\014")
