@@ -1,4 +1,4 @@
-#by
+
 
 if(!exists("foo", mode="function")) source("init2.R")
 
@@ -20,17 +20,15 @@ my.InnerLoop2 = 11
 auxVarMainVar <- factor(data_xlsx[[my.MainLoop]])
 data_analysis1 <- table(auxVarMainVar)/sum(table(auxVarMainVar))
 data_analysis2 <- table(auxVarMainVar)
-
-
 vars_deletar <- names(data_analysis1)
-
+#
+print("Conição I - erro de 1%")
 for (count_iter in 1:length(data_analysis1)) {
   #count_iter=5
-  print(vars_deletar[count_iter])
-   if(data_analysis1[count_iter] < 0.01){   
-     print(paste("Deletando dados incompativeis relacionados a -->", data_analysis1[count_iter], sep= " "))
-     auxVarMainVar <- auxVarMainVar[!auxVarMainVar[[my.MainLoop]] %in% c(toString(vars_deletar[count_iter])) ]
-    
+  #print(vars_deletar[count_iter])
+   if(data_analysis1[count_iter] < 0.1){   
+     print(paste("Suprimir tabela de dados relacionados ao Clima [",vars_deletar[count_iter] ,"] com média [ ", data_analysis1[count_iter]," ]", sep= " "))
+     data2 <- data_xlsx[ data_xlsx$Clima != data_analysis1[count_iter] , ] 
     }
     
 }
