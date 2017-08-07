@@ -1,25 +1,115 @@
-if(!exists("foo", mode="function")) source("init.R")
-# A ideia desse script ? criar uma fun??o que fa?a um test tukey para 
-# 2 fatores, agrupando assim os tratamentos segundo esses dois fatores
-# tais como Bioma e Ecosistema
-# Uma fun??o complementar poder? tamb?m fazer isto separando por um 
-# terceiro fator tal como Clima
-# Como primeira etapa, tem que verificar que:
-#  - o clima estudado contem pelo menos 1% do total dos dados E 
-#  - um n?mero de linha >=5.
-# table(dados$Clima)/sum(table(dados$Clima))
-# table(dados$Clima)
+#by
+
+if(!exists("foo", mode="function")) source("init2.R")
+
 cat("\014")
-listaColunas <- colnames(data_CSV) 
+
+listaColunas <- colnames(data_xlsx) 
 mostraElementos(listaColunas)
 
-dados1 <- data[!data$Clima %in% c("As"), ]
+#my.variableComparation <-readline(prompt="Digite a variavel de comparação principal : ")
+#my.MainLoop   <-readline(prompt="Digite o caondição principal : ")
+#my.InnerLoop1 <-readline(prompt="Digite o parâmetro/Condição para iterar: ")
+#my.InnerLoop2 <-readline(prompt="Digite o segundo parâmetro/Condição para iterar: ")
 
-##fun??o que exlui climas que n?o se enquadram
-#Dentro dos climas que se enquadram nessas condi??es, tem que verificar que
-#cada conjunto Ecosistema-Bioma :
-#  - represente pelo menos 1% dos dados NAQUELE CLIMA E 
-#  - um n?mero de linha >=5
+my.variableComparation = 21
+my.MainLoop   = 9
+my.InnerLoop1 = 10
+my.InnerLoop2 = 11
+
+auxVarMainVar <- factor(data_xlsx[[my.MainLoop]])
+data_analysis1 <- table(auxVarMainVar)/sum(table(auxVarMainVar))
+data_analysis2 <- table(auxVarMainVar)
+
+
+vars_deletar <- names(data_analysis1)
+
+for (count_iter in 1:length(data_analysis1)) {
+  #count_iter=5
+  print(vars_deletar[count_iter])
+   if(data_analysis1[count_iter] < 0.01){   
+     print(paste("Deletando dados incompativeis relacionados a -->", data_analysis1[count_iter], sep= " "))
+     auxVarMainVar <- auxVarMainVar[!auxVarMainVar[[my.MainLoop]] %in% c(toString(vars_deletar[count_iter])) ]
+    
+    }
+    
+}
+
+
+  selecionaInerloop_primeiroParametro <- data_xlsx[[listaColunas[[as.integer(my.InnerLoop1)]]]]
+  selecionaInerloop_segundoParametro <- data_xlsx[[listaColunas[[as.integer(my.InnerLoop2)]]]]
+
+AgregaParametro1 <- setDT(list(selecionaInerloop_primeiroParametro))
+AgregaParametro2 <- setDT(list(selecionaInerloop_segundoParametro))
+
+selecaoDeColuna1 <- agregaElementros(selecionaInerloop_primeiroParametro,AgregaParametro1)
+  mostraElementos(selecaoDeColuna1[[1]])
+selecaoDeColuna2 <- agregaElementros(selecionaInerloop_segundoParametro,AgregaParametro2)
+  mostraElementos(selecaoDeColuna2[[2]])
+
+#DF <- setDT(list(selecionaInerloop_primeiroParametro))
+#selecaoDeColuna <- DF[ , .(info = list(V1)), by = V1]
+#mostraElementos(selecaoDeColuna$V1)
+#tamanhoListaSelecao <-length(selecaoDeColuna$info)
+  
+  ############################################################################ 
+  #                                 INNER LOOP I                             #
+  ############################################################################
+    for (count_size in 1:length(selecaoDeColuna1[[1]])) {
+      #count_size =1
+      
+      dadoSelecionado <- subset(data_xlsx, 
+                               eval(parse(text=listaColunas[[as.integer(my.InnerLoop1)]])) 
+                               == 
+                               toString(selecaoDeColuna1$V1[count_size]))
+     
+       print (paste(listaColunas[[as.integer(my.InnerLoop1)]],selecaoDeColuna1$V1[count_size], sep="  ->  "))
+      
+      m0 <- glm( (eval(parse(text=listaColunas[[as.integer(my.variableComparation)]]))+0.1) ~ 
+                  eval(parse(text=listaColunas[[as.integer(my.InnerLoop2)]])),
+                             family=Gamma(link='log'),
+                             data=dadoSelecionado)
+      
+      dfe <- df.residual(m0)
+      mse <- deviance(m0)/dfe
+      tuk <- HSD.test(y = dadoSelecionado[[my.variableComparation]],
+                      trt = dadoSelecionado[[my.InnerLoop2]],
+                      DFerror = dfe,
+                      MSerror = mse)
+      tuk$groups
+     
+    }
+  
+  ############################################################################ 
+  #                                 INNER LOOP II                            #
+  ############################################################################
+  for (count_size in 1:length(selecaoDeColuna2[[1]])) {
+    #count_size =2
+    count_size
+    dadoSelecionado2 <- subset(data_xlsx, 
+                              eval(parse(text=listaColunas[[as.integer(my.InnerLoop2)]])) 
+                              == 
+                              toString(selecaoDeColuna2$V1[count_size]))
+    
+    print (paste(listaColunas[[as.integer(my.InnerLoop2)]],selecaoDeColuna2$V1[count_size], sep="  ->  "))
+    
+    m0 <- glm( (eval(parse(text=listaColunas[[as.integer(my.variableComparation)]]))+0.1) ~ eval(parse(text=listaColunas[[as.integer(my.InnerLoop1)]])),
+               family=Gamma(link='log'),
+               data=dadoSelecionado)
+    
+    dfe <- df.residual(m0)
+    mse <- deviance(m0)/dfe
+    tuk <- HSD.test(y = dadoSelecionado2[[my.variableComparation]],
+                    trt = dadoSelecionado2[[my.InnerLoop1]],
+                    DFerror = dfe,
+                    MSerror = mse)
+    tuk$groups
+    
+  }
+  
+
+
+
 
 dados2 <- dados1[!dados2$Bioma %in% c("Cerrado"), ]##quando precisa retirar dados
 

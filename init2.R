@@ -30,17 +30,20 @@ showWarnings = FALSE
    pkgTest("agricolae")
    pkgTest("svDialogs")
    pkgTest("plyr")
+   pkgTest("readxl")
+   pkgTest("dplyr")
+   pkgTest("sqldf")
+
+   
+   library(data.table)
+   library(sqldf)
+   library(dplyr)
    library(agricolae)
    library(svDialogs)
    library(plyr)
+   library(readxl)
    
-   
-   
-  # devtools::install_github(c('jeroenooms/jsonlite', 'rstudio/shiny', 'ramnathv/htmlwidgets', 'timelyportfolio/listviewer'))
-  # library(listviewer)
-  # jsonedit( myList )
-   
-#
+
 ############################################################################ 
 #                                         MAIN                             #
 ############################################################################
@@ -50,15 +53,35 @@ showWarnings = FALSE
   userInfo       <- Sys.info()
   sistemInfo     <- lapply(si, function(x) if (is.list(x)) x[sort(names(x))] else sort(x))
  
-      mainDir <- getwd()
-
-	              pathToCSVfile <- paste(mainDir,"data.csv",sep="/")
-	              data_CSV <- read.csv(pathToCSVfile,sep=";",na.string="" , header = T, dec=",", fileEncoding="ISO-8859-1")
+      mainDir <- getwd()  # Project directory by default 
+      subDir  <- "Henrique.xlsx" 
+      pathToXLSxfile <- paste(mainDir,subDir,sep="/")
+      
+      if (file.exists(file.path(mainDir, subDir))){
+         data_xlsx <- read_excel(pathToXLSxfile, na = "NA")
+      } else {
+         pathToXLSxfile <- file.choose()
+         data_xlsx <- read_excel(pathToXLSxfile, na = "NA")
+      }
+      
+      #CASO CSV FILE ALTERAR READ 
+      #data_CSV  <- read.csv(pathToCSVfile,sep=";",na.string="" , header = T, dec=",", fileEncoding="ISO-8859-1")
 	   
-#### FunÇões
+############################################################################ 
+#                                 FUNÇOES                                  #
+############################################################################
 	              
 mostraElementos <- function(list) {
 for (item in 1:length(list)) {
-  print("item -> "+ item  + list[[item]])
+  print( paste("[", item,"] [",list[[item]],"] ", sep=" "))
   }
+}
+      
+agregaElementros <- function(list_toAggregate, DF) {
+  
+  DF <- setDT(list(list_toAggregate))
+  selecaoDeColuna <- DF[ , .(info = list(V1)), by = V1]
+ # mostraElementos(selecaoDeColuna$V1)
+ # tamanhoListaSelecao <-length(selecaoDeColuna$info)
+
 }
