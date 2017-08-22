@@ -85,3 +85,8 @@ agregaElementros <- function(list_toAggregate, DF) {
  # tamanhoListaSelecao <-length(selecaoDeColuna$info)
 
 }
+
+incrementa <- function(x)
+{
+  eval.parent(substitute(x <- x + 1))
+}
