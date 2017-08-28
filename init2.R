@@ -86,7 +86,4 @@ agregaElementros <- function(list_toAggregate, DF) {
 
 }
 
-incrementa <- function(x)
-{
-  eval.parent(substitute(x <- x + 1))
-}
+incrementa <- function(x){  eval.parent(substitute(x <- x + 1))   }
